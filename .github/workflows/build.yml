@@ -17,17 +17,20 @@ jobs:
 
       - name: Clone Repo
         run: |
-            export LATEST_APP=$(wget -qO- https://api.github.com/repos/QuantumNous/new-api/tags | gawk -F '["v]' '/name/{print "v"$5;exit}')
+            export LATEST_APP=$(wget -qO- https://api.github.com/repos/Calcium-Ion/new-api/tags | gawk -F '["v]' '/name/{print "v"$5;exit}')
             git clone -b $LATEST_APP https://github.com/Calcium-Ion/new-api
 
       - name: Build Frontend
         env:
           CI: ""
         run: |
-          cd new-api/web
+          cd new-api/web/default
           bun install
           DISABLE_ESLINT_PLUGIN='true' VITE_REACT_APP_VERSION=$(git describe --tags) bun run build
-          cd ../..
+          cd ../classic
+          bun install
+          DISABLE_ESLINT_PLUGIN='true' VITE_REACT_APP_VERSION=$(git describe --tags) bun run build
+          cd ../../..
 
       - name: Build Backend
         uses: vmactions/freebsd-vm@v1
@@ -36,7 +39,7 @@ jobs:
           release: 13.2
           prepare: |
             pkg install -y jq wget curl git gcc bash gawk gsed
-            wget https://dl.google.com/go/go1.24.4.freebsd-amd64.tar.gz && tar -C /usr/local -xzf go1.24.4.freebsd-amd64.tar.gz && rm go1.24.4.freebsd-amd64.tar.gz
+            wget https://dl.google.com/go/go1.25.6.freebsd-amd64.tar.gz && tar -C /usr/local -xzf go1.25.6.freebsd-amd64.tar.gz && rm go1.25.6.freebsd-amd64.tar.gz
             ln -s /usr/local/go/bin/go /usr/local/bin/go
           # curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
           # echo '. $HOME/.cargo/env' >> ~/.bashrc
@@ -61,7 +64,7 @@ jobs:
       - name: Create release
         uses: softprops/action-gh-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ steps.tag.outputs.release_tag }}
           files: |
