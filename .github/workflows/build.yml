@@ -20,6 +20,11 @@ jobs:
             export LATEST_APP=$(wget -qO- https://api.github.com/repos/Calcium-Ion/new-api/tags | gawk -F '["v]' '/name/{print "v"$5;exit}')
             git clone -b $LATEST_APP https://github.com/Calcium-Ion/new-api
 
+      - name: Apply patches
+        run: |
+          cd new-api
+          git apply ../patch/channel-test.patch
+
       - name: Build Frontend
         env:
           CI: ""
