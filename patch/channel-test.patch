@@ -1,67 +1,85 @@
 diff --git a/controller/channel-test.go b/controller/channel-test.go
-index 4ba3698bd..284b380ed 100644
+index 4ba3698bd..fcf54639e 100644
 --- a/controller/channel-test.go
 +++ b/controller/channel-test.go
-@@ -693,7 +693,7 @@ func detectErrorMessageFromJSONBytes(jsonBytes []byte) string {
+@@ -692,8 +692,26 @@ func detectErrorMessageFromJSONBytes(jsonBytes []byte) string {
+ 	return message
  }
  
++// testChatPrompts are short, low-cost prompts used for channel connectivity
++// tests. buildTestRequest selects one at random per test so repeated tests do
++// not always send an identical payload upstream.
++var testChatPrompts = []string{
++	"just say meow and move on",
++	"echo'ing the output of cowsay",
++	"reply with a single word: pong",
++	"name one color, one word only",
++	"respond with just: ok",
++	"ping, then reply with pong",
++	"greet me in one short line",
++	"what a wonderful world, reply briefly",
++}
++
  func buildTestRequest(model string, endpointType string, channel *model.Channel, isStream bool) dto.Request {
--	testResponsesInput := json.RawMessage(`[{"role":"user","content":"hi"}]`)
-+	testResponsesInput := json.RawMessage(`[{"role":"user","content":"just say meow and move on"}]`)
++	prompt := testChatPrompts[common.GetRandomInt(len(testChatPrompts))]
+ 	testResponsesInput := json.RawMessage(`[{"role":"user","content":"hi"}]`)
++	if raw, err := common.Marshal([]dto.Message{{Role: "user", Content: prompt}}); err == nil {
++		testResponsesInput = raw
++	}
  
  	// 根据端点类型构建不同的测试请求
  	if endpointType != "" {
-@@ -702,7 +702,7 @@ func buildTestRequest(model string, endpointType string, channel *model.Channel,
+@@ -702,7 +720,7 @@ func buildTestRequest(model string, endpointType string, channel *model.Channel,
  			// 返回 EmbeddingRequest
  			return &dto.EmbeddingRequest{
  				Model: model,
 -				Input: []any{"hello world"},
-+				Input: []any{"what a wondelful world"},
++				Input: []any{prompt},
  			}
  		case constant.EndpointTypeImageGeneration:
  			// 返回 ImageRequest
-@@ -724,7 +724,7 @@ func buildTestRequest(model string, endpointType string, channel *model.Channel,
+@@ -724,7 +742,7 @@ func buildTestRequest(model string, endpointType string, channel *model.Channel,
  			// 返回 OpenAIResponsesRequest
  			return &dto.OpenAIResponsesRequest{
  				Model:  model,
 -				Input:  json.RawMessage(`[{"role":"user","content":"hi"}]`),
-+				Input:  json.RawMessage(`[{"role":"user","content":"just say meow and move on"}]`),
++				Input:  testResponsesInput,
  				Stream: lo.ToPtr(isStream),
  			}
  		case constant.EndpointTypeOpenAIResponseCompact:
-@@ -745,7 +745,7 @@ func buildTestRequest(model string, endpointType string, channel *model.Channel,
+@@ -745,7 +763,7 @@ func buildTestRequest(model string, endpointType string, channel *model.Channel,
  				Messages: []dto.Message{
  					{
  						Role:    "user",
 -						Content: "hi",
-+						Content: "echo'ing the output of cowsay",
++						Content: prompt,
  					},
  				},
  				MaxTokens: lo.ToPtr(maxTokens),
-@@ -774,7 +774,7 @@ func buildTestRequest(model string, endpointType string, channel *model.Channel,
+@@ -774,7 +792,7 @@ func buildTestRequest(model string, endpointType string, channel *model.Channel,
  		// 返回 EmbeddingRequest
  		return &dto.EmbeddingRequest{
  			Model: model,
 -			Input: []any{"hello world"},
-+			Input: []any{"what a wonderful world"},
++			Input: []any{prompt},
  		}
  	}
  
-@@ -790,7 +790,7 @@ func buildTestRequest(model string, endpointType string, channel *model.Channel,
+@@ -790,7 +808,7 @@ func buildTestRequest(model string, endpointType string, channel *model.Channel,
  	if strings.Contains(strings.ToLower(model), "codex") {
  		return &dto.OpenAIResponsesRequest{
  			Model:  model,
 -			Input:  json.RawMessage(`[{"role":"user","content":"hi"}]`),
-+			Input:  json.RawMessage(`[{"role":"user","content":"echo'ing the output of cowsay"}]`),
++			Input:  testResponsesInput,
  			Stream: lo.ToPtr(isStream),
  		}
  	}
-@@ -802,7 +802,7 @@ func buildTestRequest(model string, endpointType string, channel *model.Channel,
+@@ -802,7 +820,7 @@ func buildTestRequest(model string, endpointType string, channel *model.Channel,
  		Messages: []dto.Message{
  			{
  				Role:    "user",
 -				Content: "hi",
-+				Content: "just say meow and move on",
++				Content: prompt,
  			},
  		},
  	}
