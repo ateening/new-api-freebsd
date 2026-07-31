@@ -29,13 +29,10 @@ jobs:
         env:
           CI: ""
         run: |
-          cd new-api/web/default
+          cd new-api/web/
           bun install
           DISABLE_ESLINT_PLUGIN='true' VITE_REACT_APP_VERSION=$(git describe --tags) bun run build
-          cd ../classic
-          bun install --filter ./ --frozen-lockfile
-          DISABLE_ESLINT_PLUGIN='true' VITE_REACT_APP_VERSION=$(git describe --tags) bun run build
-          cd ../../..
+          cd ../../
 
       - name: Build Backend
         uses: vmactions/freebsd-vm@v1
