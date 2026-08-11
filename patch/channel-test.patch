@@ -1,8 +1,8 @@
 diff --git a/controller/channel-test.go b/controller/channel-test.go
-index 4ba3698bd..fcf54639e 100644
+index fffc59d24..1841dc8d4 100644
 --- a/controller/channel-test.go
 +++ b/controller/channel-test.go
-@@ -692,8 +692,26 @@ func detectErrorMessageFromJSONBytes(jsonBytes []byte) string {
+@@ -689,8 +689,26 @@ func detectErrorMessageFromJSONBytes(jsonBytes []byte) string {
  	return message
  }
  
@@ -29,7 +29,7 @@ index 4ba3698bd..fcf54639e 100644
  
  	// 根据端点类型构建不同的测试请求
  	if endpointType != "" {
-@@ -702,7 +720,7 @@ func buildTestRequest(model string, endpointType string, channel *model.Channel,
+@@ -699,7 +717,7 @@ func buildTestRequest(model string, endpointType string, channel *model.Channel,
  			// 返回 EmbeddingRequest
  			return &dto.EmbeddingRequest{
  				Model: model,
@@ -38,7 +38,7 @@ index 4ba3698bd..fcf54639e 100644
  			}
  		case constant.EndpointTypeImageGeneration:
  			// 返回 ImageRequest
-@@ -724,7 +742,7 @@ func buildTestRequest(model string, endpointType string, channel *model.Channel,
+@@ -721,7 +739,7 @@ func buildTestRequest(model string, endpointType string, channel *model.Channel,
  			// 返回 OpenAIResponsesRequest
  			return &dto.OpenAIResponsesRequest{
  				Model:  model,
@@ -47,7 +47,7 @@ index 4ba3698bd..fcf54639e 100644
  				Stream: lo.ToPtr(isStream),
  			}
  		case constant.EndpointTypeOpenAIResponseCompact:
-@@ -745,7 +763,7 @@ func buildTestRequest(model string, endpointType string, channel *model.Channel,
+@@ -761,7 +779,7 @@ func buildTestRequest(model string, endpointType string, channel *model.Channel,
  				Messages: []dto.Message{
  					{
  						Role:    "user",
@@ -55,8 +55,8 @@ index 4ba3698bd..fcf54639e 100644
 +						Content: prompt,
  					},
  				},
- 				MaxTokens: lo.ToPtr(maxTokens),
-@@ -774,7 +792,7 @@ func buildTestRequest(model string, endpointType string, channel *model.Channel,
+ 				MaxTokens: lo.ToPtr(uint(16)),
+@@ -790,7 +808,7 @@ func buildTestRequest(model string, endpointType string, channel *model.Channel,
  		// 返回 EmbeddingRequest
  		return &dto.EmbeddingRequest{
  			Model: model,
@@ -65,7 +65,7 @@ index 4ba3698bd..fcf54639e 100644
  		}
  	}
  
-@@ -790,7 +808,7 @@ func buildTestRequest(model string, endpointType string, channel *model.Channel,
+@@ -798,7 +816,7 @@ func buildTestRequest(model string, endpointType string, channel *model.Channel,
  	if strings.Contains(strings.ToLower(model), "codex") {
  		return &dto.OpenAIResponsesRequest{
  			Model:  model,
@@ -74,7 +74,7 @@ index 4ba3698bd..fcf54639e 100644
  			Stream: lo.ToPtr(isStream),
  		}
  	}
-@@ -802,7 +820,7 @@ func buildTestRequest(model string, endpointType string, channel *model.Channel,
+@@ -810,7 +828,7 @@ func buildTestRequest(model string, endpointType string, channel *model.Channel,
  		Messages: []dto.Message{
  			{
  				Role:    "user",
